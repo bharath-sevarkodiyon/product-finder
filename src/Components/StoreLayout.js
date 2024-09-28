@@ -1,69 +1,50 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import '../App.css'
-import { MapPinIcon } from "@heroicons/react/solid"; // Import Heroicons' map pin icon
 
 const StoreLayout = ({ selectedProduct }) => {
-  const [products, setProducts] = useState([]);
-  const aisles = Array.from({ length: 55 }, (_, i) => i + 1); // Aisles 1 to 56
+  const [storeLayout, setStoreLayout] = useState(null);
+  const aisles = Array.from({ length: 121 }, (_, i) => i + 1);
 
   useEffect(() => {
-    // Fetch products data from the API
-    const fetchProducts = async () => {
-      try {
-        const productResponse = await axios.get(
-          "http://localhost:5000/api/product"
-        );
-        setProducts(productResponse.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-    fetchProducts();
+    const savedLayout = localStorage.getItem('storeLayout');
+    if (savedLayout) {
+      setStoreLayout(JSON.parse(savedLayout));
+    }
   }, []);
+
+  const isCellSelected = (cellName) => {
+    if (!storeLayout || !storeLayout.cellMappings[cellName]) return false;
+    return storeLayout.cellMappings[cellName].includes(selectedProduct);
+  };
+
+  const isYouAreHereCell = (cellName) => {
+    if (!storeLayout || !storeLayout.cellMappings[cellName]) return false;
+    return storeLayout.cellMappings[cellName].includes("You are here");
+  };
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold p-4">Avengers Store - Aisles</h1>
-      <div className="grid grid-cols-11 gap-y-5 gap-x-8 p-3 bg-gray-100">
+      <h1 className="text-2xl font-semibold p-4">Avengers Store</h1>
+      <div className="grid grid-cols-11 gap-y-2 gap-x-3 p-3">
         {aisles.map((aisle) => {
-          const product = products[aisle - 1]; // Get the product for the current aisle
-          const isSelected = product && product.productName === selectedProduct; // Check if this product is the selected one
+          const cellName = String.fromCharCode(65 + ((aisle - 1) % 11)) + Math.ceil(aisle / 11);
+          const isSelected = isCellSelected(cellName);
+          const showYouAreHere = isYouAreHereCell(cellName);
 
           return (
             <div
               key={`aisle-${aisle}`}
-              className={`p-5 border border-black flex justify-center items-center transition ${
-                isSelected ? "blinking-effect" : "bg-lime-300"
-              } opacity-50 hover:opacity-100 cursor-pointer`}
+              className={`p-4 flex flex-col justify-center items-center transition ${
+                isSelected ? "blinking-effect" : "bg-[#d2d2d2]"
+              } cursor-pointer relative w-28 h-10`}
             >
-              <span>Aisle {aisle}</span>
+              {/* <span className="text-xs absolute top-1 left-1 text-gray-600">{cellName}</span> */}
+              {showYouAreHere && (
+                <span className="text-xs font-semibold">You are Here</span>
+              )}
             </div>
           );
         })}
-      </div>
-      {/* "You are Here" Icon Section */}
-      <div className="flex flex-col justify-center items-center mt-6">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="size-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-          />
-        </svg>
-        <p className="font-bold text-lg mt-2">You are Here</p>
       </div>
     </div>
   );

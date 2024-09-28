@@ -1,28 +1,21 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 
 const ProductCategory = ({ onCategorySelect }) => {
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All"); // Default focus on "All"
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  useEffect(() => {
-    // Fetch product categories
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/productCategory");
-        setCategories(response.data); // Assuming response.data contains the category array
-      } catch (error) {
-        console.error("Error fetching categories", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+  // Local JSON data for categories
+  const categoryData = [
+    { _id: "1", categoryName: "Cameras" },
+    { _id: "2", categoryName: "Laptops" },
+    { _id: "3", categoryName: "Appliances" },
+    { _id: "4", categoryName: "Electronics" },
+    { _id: "5", categoryName: "Fashion" },
+  ];
 
   // Handle category selection and update selectedCategory state
   const handleCategorySelect = (categoryName) => {
-    setSelectedCategory(categoryName);
-    onCategorySelect(categoryName); // Notify parent component of the selected category
+    setSelectedCategory(categoryName); // Set selectedCategory to the category ID
+    onCategorySelect(categoryName);    // Pass the category ID to the parent component
   };
 
   return (
@@ -31,11 +24,11 @@ const ProductCategory = ({ onCategorySelect }) => {
         className={`category-item py-2 px-4 rounded-lg font-bold transition cursor-pointer ${
           selectedCategory === "All" ? "bg-[#2C2C2C] text-white" : "bg-transparent text-[#2C2C2C]"
         }`}
-        onClick={() => handleCategorySelect("All")}
+        onClick={() => handleCategorySelect("All")} // Select "All" (for no filtering)
       >
         All
       </button>
-      {categories.map((category) => (
+      {categoryData.map((category) => (
         <button
           key={category._id}
           className={`category-item py-2 px-4 rounded-lg font-bold transition cursor-pointer ${
@@ -43,7 +36,7 @@ const ProductCategory = ({ onCategorySelect }) => {
               ? "bg-[#2C2C2C] text-white"  // Highlight the selected category
               : "bg-transparent text-[#2C2C2C]"  // Default styling
           }`}
-          onClick={() => handleCategorySelect(category.categoryName)}
+          onClick={() => handleCategorySelect(category.categoryName)}  // Pass the category ID instead of name
         >
           {category.categoryName}
         </button>

@@ -1,22 +1,17 @@
 /* Extra Vibrant colors */
-body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(to bottom, #1CB5E0, #000046);
-}
-
 .blinking-effect {
-  background-color: blue;
+  background-color: #80b6ab;
   animation: blink 1s infinite;
 }
 
 @keyframes blink {
   0% {
-    background-color: blue;
+    background-color: #394b41;
   }
   50% {
-    background-color: lightblue;
+    background-color: #85908e;
   }
   100% {
-    background-color: blue;
+    background-color: #97b1ab;
   }
 }
